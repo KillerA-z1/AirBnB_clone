@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """Defines the HBnB console."""
 import cmd
+from models.base_model import BaseModel
 
 
 class HBNBCommand(cmd.Cmd):
@@ -11,13 +12,14 @@ class HBNBCommand(cmd.Cmd):
     """
     intro = 'Welcome to AirBnB clone project.\n'
     prompt = "(hbnb) "
+    cls = ["BaseModel", ]
 
     def emptyline(self):
         """Do nothing upon receiving an empty line."""
         pass
 
     def do_quit(self, arg):
-        """exit the program."""
+        """Exit the program."""
         print('Thank you for using AirBnB clone.')
         return True
 
