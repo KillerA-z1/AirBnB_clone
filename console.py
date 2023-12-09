@@ -8,9 +8,7 @@ class HBNBCommand(cmd.Cmd):
     """Defines command interpreter to manage AirBnB clone project.
     Attributes:
         prompt (str): The command prompt.
-        intro (str): The introduction to the command interpreter.
     """
-    intro = 'Welcome to AirBnB clone project.\n'
     prompt = "(hbnb) "
     cls = ["BaseModel", ]
 
@@ -20,7 +18,6 @@ class HBNBCommand(cmd.Cmd):
 
     def do_quit(self, arg):
         """Exit the program."""
-        print('Thank you for using AirBnB clone.')
         return True
 
     def do_EOF(self, arg):

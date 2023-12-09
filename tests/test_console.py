@@ -22,8 +22,7 @@ class TestConsole(unittest.TestCase):
     def test_quit(self):
         with patch('sys.stdout', new=StringIO()) as fake_out:
             self.assertTrue(self.console.onecmd('quit'))
-            expected_output = 'Thank you for using AirBnB clone.\n'
-            self.assertEqual(fake_out.getvalue(), expected_output)
+            self.assertEqual(fake_out.getvalue(), '')
 
     def test_EOF(self):
         with patch('sys.stdout', new=StringIO()) as fake_out:
