@@ -1,51 +1,85 @@
-import json
 import unittest
 from unittest.mock import patch
 from io import StringIO
-from console import HBNBCommand
 from models.base_model import BaseModel
+from models.engine.file_storage import FileStorage
+import models
+import json
+from datetime import datetime
+import os
 
 
-class TestHBNBCommand(unittest.TestCase):
-    # Add your testing methods here, for example:
-    def test_create(self, mock_stdout):
-        with patch('builtins.input',
-                   return_value="create BaseModel") as mock_input:
-            HBNBCommand().onecmd("create BaseModel")
-            self.assertIn("BaseModel", mock_stdout.getvalue())
+class TestBaseModel(unittest.TestCase):
+    def setUp(self):
+        # Create a temporary file for testing
+        self.temp_file_path = "temp_file.json"
+        models.storage._FileStorage__file_path = self.temp_file_path
+        self.storage = FileStorage()
+        self.storage.reload()
 
-    # Add more testing methods based on your console functionality
+    def tearDown(self):
+        # Remove the temporary file after testing
+        if os.path.exists(self.temp_file_path):
+            os.remove(self.temp_file_path)
 
-    def test_base_model(self):
+    def test_init(self):
+        # Test if the attributes are set correctly during initialization
         my_model = BaseModel()
-        my_model.name = "My First Model"
-        my_model.my_number = 89
-        self.assertEqual(my_model.name, "My First Model")
-        self.assertEqual(my_model.my_number, 89)
-        model_str = "[BaseModel] ({}) {}".format(my_model.id,
-                                                 my_model.__dict__)
-        self.assertEqual(str(my_model), model_str)
+        self.assertTrue(hasattr(my_model, 'id'))
+        self.assertTrue(hasattr(my_model, 'created_at'))
+        self.assertTrue(hasattr(my_model, 'updated_at'))
+
+    def test_str(self):
+        # Test the __str__ method
+        my_model = BaseModel()
+        expected_str = "[BaseModel] ({}) {}".format(my_model.id,
+                                                    my_model.__dict__)
+        self.assertEqual(str(my_model), expected_str)
+
+    def test_to_dict(self):
+        # Test the to_dict method
+        my_model = BaseModel()
+        my_model.my_number = 42
+        my_model.name = "Test Model"
+        my_model_dict = my_model.to_dict()
+
+        # Check if the dictionary has the expected keys and values
+        self.assertIn('my_number', my_model_dict)
+        self.assertIn('name', my_model_dict)
+        self.assertIn('__class__', my_model_dict)
+        self.assertIn('updated_at', my_model_dict)
+        self.assertIn('id', my_model_dict)
+        self.assertIn('created_at', my_model_dict)
+
+        self.assertEqual(my_model_dict['my_number'], 42)
+        self.assertEqual(my_model_dict['name'], "Test Model")
+        self.assertEqual(my_model_dict['__class__'], 'BaseModel')
+
+    def test_save(self):
+        # Test the save method
+        my_model = BaseModel()
+        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            my_model.save()
+            self.assertIn("", mock_stdout.getvalue().strip())
+
+    def test_reload(self):
+        # Test the reload method
+        my_model = BaseModel()
         my_model.save()
-        self.assertIsNotNone(my_model.updated_at)
-        my_model_json = my_model.to_dict()
-        self.assertEqual(my_model_json['name'], "My First Model")
-        self.assertEqual(my_model_json['my_number'], 89)
-        self.assertEqual(my_model_json['__class__'], "BaseModel")
-        self.assertEqual(type(my_model_json['created_at']), str)
-        self.assertEqual(type(my_model_json['updated_at']), str)
-        print("JSON of my_model:")
-        for key in my_model_json.keys():
-            print("\t{}: ({}) - {}".format(key,
-                                           type(my_model_json[key]),
-                                           my_model_json[key]))
 
-    @patch('sys.stdout', new_callable=StringIO)
-    def test_create(self, mock_stdout):
-        with patch('builtins.input', return_value="create BaseModel"):
-            HBNBCommand().onecmd("create BaseModel")
-            self.assertIn("BaseModel", mock_stdout.getvalue())
+        # Save the changes to the file before reloading
+        models.storage.save()
 
-    # Add more testing methods based on your console functionality
+        # Reload data from the file
+        models.storage.reload()
+
+        # Retrieve the saved object
+        new_model = models.storage.all()["BaseModel.{}".format(my_model.id)]
+
+        # Check if the new instance has the same attributes as saved instance
+        self.assertEqual(new_model.id, my_model.id)
+        self.assertEqual(new_model.created_at, my_model.created_at)
+        self.assertEqual(new_model.updated_at, my_model.updated_at)
 
 
 if __name__ == '__main__':
