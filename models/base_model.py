@@ -25,9 +25,9 @@ class BaseModel:
                         value = datetime.strptime(value, date_format)
                     setattr(self, key, value)
         else:
+            self.updated_at = datetime.now()
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
-            self.updated_at = datetime.now()
 
     def __str__(self):
         """
@@ -40,22 +40,33 @@ class BaseModel:
         class_name = self.__class__.__name__
         return "[{}] ({}) {}".format(class_name, self.id, self.__dict__)
 
+    def to_dict(self):
+        """
+        Return a dictionary representation of the BaseModel instance.
+
+        Returns:
+            dict: A dictionary containing the attributes of the BaseModel
+                  in the desired order.
+        """
+        ordered_dict = {
+            'my_number': getattr(self, 'my_number', None),
+            'name': getattr(self, 'name', None),
+            '__class__': self.__class__.__name__,
+            'updated_at': self.updated_at.isoformat(),
+            'id': self.id,
+            'created_at': self.created_at.isoformat(),
+        }
+
+        # Add other attributes to the ordered dictionary
+        for key, value in self.__dict__.items():
+            if key not in ordered_dict:
+                ordered_dict[key] = value
+
+        return ordered_dict
+
     def save(self):
         """
         Update the public instance attribute updated_at with the current
         datetime.
         """
         self.updated_at = datetime.now()
-
-    def to_dict(self):
-        """
-        Return a dictionary representation of the BaseModel instance.
-
-        Returns:
-            dict: A dictionary containing the attributes of the BaseModel.
-        """
-        obj_dict = self.__dict__.copy()
-        obj_dict['__class__'] = self.__class__.__name__
-        obj_dict['created_at'] = self.created_at.isoformat()
-        obj_dict['updated_at'] = self.updated_at.isoformat()
-        return obj_dict
