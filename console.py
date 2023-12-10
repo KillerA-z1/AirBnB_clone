@@ -4,6 +4,12 @@
 import cmd
 from models.base_model import BaseModel
 from models import storage
+from models.amenity import Amenity
+from models.city import City
+from models.place import Place
+from models.review import Review
+from models.state import State
+from models.user import User
 
 
 class HBNBCommand(cmd.Cmd):
@@ -29,20 +35,30 @@ class HBNBCommand(cmd.Cmd):
         print("")
         return True
 
-    def do_create(self, arg):
-        """Create a new instance of BaseModel, save it, and print the id."""
-        if not arg:
+    def do_create(self, line):
+        """Creates a new instance of a given class, saves it to the file,
+            and prints its id.
+        Usage: create <class>
+        """
+        args = line.split()
+        if len(args) < 1:
             print("** class name missing **")
-            return
-
-        class_name = arg
-        if class_name not in storage.classes():
+        elif args[0] not in storage.classes():
             print("** class doesn't exist **")
-            return
-
-        new_instance = eval(class_name)()
-        new_instance.save()
-        print(new_instance.id)
+        else:
+            # Assuming you have a dictionary mapping class names to classes
+            # Add all your classes here
+            class_dict = {
+                "User": User,
+                'Place': Place,
+                'City': City,
+                'Review': Review,
+                'State': State,
+                'Amenity': Amenity,
+                        }
+            new_instance = class_dict[args[0]]()
+            new_instance.save()
+            print(new_instance.id)
 
     def do_show(self, arg):
         """Prints the string representation of an instance."""
@@ -113,26 +129,33 @@ class HBNBCommand(cmd.Cmd):
                 attr_value = int(attr_value)
             elif attr_value.replace('.', '', 1).isdigit():
                 attr_value = float(attr_value)
-            storage.update(instances[key], attr_name, attr_value)
+        setattr(instances[key], attr_name, attr_value)
+        instances[key].save()
 
-    def do_destroy(self, line):
+    def do_destroy(self, arg):
         """Deletes an instance based on the class name and id."""
-        args = line.split()
-        if len(args) == 0:
+        if not arg:
             print("** class name missing **")
             return
-        if args[0] not in storage.classes():
+
+        words = arg.split()
+        class_name = words[0]
+        if class_name not in storage.classes():
             print("** class doesn't exist **")
             return
-        if len(args) == 1:
+
+        if len(words) < 2:
             print("** instance id missing **")
             return
-        instances = storage.all(args[0])
-        key = "{}.{}".format(args[0], args[1])
+
+        instance_id = words[1]
+        key = "{}.{}".format(class_name, instance_id)
+        instances = storage.all(class_name)
         if key not in instances:
             print("** no instance found **")
-            return
-        storage.delete(instances[key])
+        else:
+            del instances[key]
+            storage.save()
 
 
 if __name__ == "__main__":
