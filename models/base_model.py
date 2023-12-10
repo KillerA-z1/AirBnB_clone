@@ -1,7 +1,5 @@
 #!/usr/bin/python3
-"""
-Defines the BaseModel class.
-"""
+""" Defines the BaseModel class."""
 
 import models
 import uuid

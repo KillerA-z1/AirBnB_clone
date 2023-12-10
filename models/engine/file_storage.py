@@ -3,6 +3,7 @@
 import cmd
 import json
 from models.base_model import BaseModel
+from models.user import User
 
 
 class FileStorage:
@@ -66,3 +67,9 @@ class FileStorage:
     def classes(self):
         """Returns a list of class names."""
         return list(self.__classes.keys())
+
+    def __init__(self):
+        self.__classes = {
+            'BaseModel': BaseModel,
+            'User': User,
+        }
