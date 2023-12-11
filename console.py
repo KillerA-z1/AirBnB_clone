@@ -158,6 +158,16 @@ class HBNBCommand(cmd.Cmd):
             del instances[key]
             storage.save()
 
+    def default(self, line):
+        if '.' in line:
+            words = line.split('.')
+            if len(words) > 1 and words[1] == 'all()':
+                self.do_all(words[0])
+            else:
+                super().default(line)
+        else:
+            super().default(line)
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
