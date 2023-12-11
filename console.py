@@ -49,6 +49,7 @@ class HBNBCommand(cmd.Cmd):
             # Assuming you have a dictionary mapping class names to classes
             # Add all your classes here
             class_dict = {
+                "BaseModel": BaseModel,
                 "User": User,
                 'Place': Place,
                 'City': City,
@@ -158,5 +159,3 @@ class HBNBCommand(cmd.Cmd):
             storage.save()
 
 
-if __name__ == "__main__":
-    HBNBCommand().cmdloop()
