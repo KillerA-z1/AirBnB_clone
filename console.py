@@ -18,6 +18,15 @@ class HBNBCommand(cmd.Cmd):
         prompt (str): The command prompt.
     """
     prompt = "(hbnb) "
+    class_dict = {
+                "BaseModel": BaseModel,
+                "User": User,
+                'Place': Place,
+                'City': City,
+                'Review': Review,
+                'State': State,
+                'Amenity': Amenity,
+                        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -161,12 +170,25 @@ class HBNBCommand(cmd.Cmd):
     def default(self, line):
         if '.' in line:
             words = line.split('.')
-            if len(words) > 1 and words[1] == 'all()':
-                self.do_all(words[0])
+            if len(words) > 1:
+                if words[1] == 'all()':
+                    self.do_all(words[0])
+                elif words[1] == 'count()':
+                    self.do_count(words[0])
             else:
                 super().default(line)
         else:
             super().default(line)
+
+    def do_count(self, class_name):
+        if class_name not in self.class_dict:
+            print("** class doesn't exist **")
+            return
+        count = 0
+        for obj in storage.all().values():
+            if obj.__class__.__name__ == class_name:
+                count += 1
+        print(count)
 
 
 if __name__ == "__main__":
