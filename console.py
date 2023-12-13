@@ -143,29 +143,26 @@ class HBNBCommand(cmd.Cmd):
         instances[key].save()
 
     def do_destroy(self, arg):
-        """Deletes an instance based on the class name and id."""
-        if not arg:
+        """
+        Deletes an instance based on the class name and id.
+
+        Args:
+            arg (str): The class name and id separated by a space.
+        """
+        args = arg.split()
+        if len(args) != 2:
             print("** class name missing **")
             return
-
-        words = arg.split()
-        class_name = words[0]
-        if class_name not in storage.classes():
+        class_name, id = args
+        if class_name not in self.class_dict:
             print("** class doesn't exist **")
             return
-
-        if len(words) < 2:
-            print("** instance id missing **")
-            return
-
-        instance_id = words[1]
-        key = "{}.{}".format(class_name, instance_id)
-        instances = storage.all(class_name)
-        if key not in instances:
+        key = f"{class_name}.{id}"
+        if key not in storage.all():
             print("** no instance found **")
-        else:
-            del instances[key]
-            storage.save()
+            return
+        del storage.all()[key]
+        storage.save()
 
     def default(self, line):
         """
@@ -181,8 +178,9 @@ class HBNBCommand(cmd.Cmd):
                 if words[1].startswith('show("') and words[1].endswith('")'):
                     id = words[1][6:-2]  # Extract the id from the string
                     self.do_show(f"{words[0]} {id}")
-                elif words[1] == 'all()':
-                    self.do_all(words[0])
+                elif words[1].startswith('destroy("') and words[1].endswith('")'):
+                    id = words[1][9:-2]  # Extract the id from the string
+                    self.do_destroy(f"{words[0]} {id}")
                 elif words[1] == 'count()':
                     self.do_count(words[0])
             else:
