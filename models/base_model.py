@@ -48,11 +48,10 @@ class BaseModel:
         Return a string representation of the BaseModel instance.
 
         Returns:
-            str: A formatted string containing the class name, id,
-            and attributes.
+            str: A string representation of the BaseModel instance.
         """
-        class_name = self.__class__.__name__
-        return "[{}] ({}) {}".format(class_name, self.id, self.__dict__)
+        return "[{}] ({}) {}".format(self.__class__.__name__,
+                                     self.id, self.__dict__)
 
     def to_dict(self):
         """
@@ -60,23 +59,13 @@ class BaseModel:
 
         Returns:
             dict: A dictionary containing the attributes of the BaseModel
-                  in the desired order.
+                in the desired order.
         """
-        ordered_dict = {
-            'my_number': getattr(self, 'my_number', None),
-            'name': getattr(self, 'name', None),
-            '__class__': self.__class__.__name__,
-            'updated_at': self.updated_at.isoformat(),
-            'id': self.id,
-            'created_at': self.created_at.isoformat(),
-        }
-
-        # Add other attributes to the ordered dictionary
-        for key, value in self.__dict__.items():
-            if key not in ordered_dict:
-                ordered_dict[key] = value
-
-        return ordered_dict
+        dict_copy = self.__dict__.copy()
+        dict_copy['__class__'] = self.__class__.__name__
+        dict_copy['created_at'] = self.created_at.isoformat()
+        dict_copy['updated_at'] = self.updated_at.isoformat()
+        return dict_copy
 
     def save(self):
         """
