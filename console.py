@@ -168,10 +168,20 @@ class HBNBCommand(cmd.Cmd):
             storage.save()
 
     def default(self, line):
+        """
+    Method called on an input line when the command prefix is not recognized.
+    In this case, it's used to handle the <class name>.show(<id>) syntax.
+
+    Args:
+        line (str): The input line.
+    """
         if '.' in line:
             words = line.split('.')
             if len(words) > 1:
-                if words[1] == 'all()':
+                if words[1].startswith('show("') and words[1].endswith('")'):
+                    id = words[1][6:-2]  # Extract the id from the string
+                    self.do_show(f"{words[0]} {id}")
+                elif words[1] == 'all()':
                     self.do_all(words[0])
                 elif words[1] == 'count()':
                     self.do_count(words[0])
@@ -181,6 +191,19 @@ class HBNBCommand(cmd.Cmd):
             super().default(line)
 
     def do_count(self, class_name):
+        """
+    Counts the number of instances of a given class.
+
+    This method iterates over all objects in storage, and increments a counter
+    for each object that is an instance of the specified class. The count is
+    then printed to the console.
+
+    If the specified class does not exist, an error message is printed and the
+    method returns without counting.
+
+    Args:
+        class_name (str): The name of the class to count instances of.
+    """
         if class_name not in self.class_dict:
             print("** class doesn't exist **")
             return
