@@ -2,6 +2,7 @@
 """Defines the HBnB console."""
 
 import cmd
+import re
 from models.base_model import BaseModel
 from models import storage
 from models.amenity import Amenity
@@ -181,8 +182,12 @@ class HBNBCommand(cmd.Cmd):
                 elif words[1].startswith('destroy("') and words[1].endswith('")'):
                     id = words[1][9:-2]  # Extract the id from the string
                     self.do_destroy(f"{words[0]} {id}")
-                elif words[1] == 'count()':
-                    self.do_count(words[0])
+                elif words[1].startswith('update("') and words[1].endswith('")'):
+                    # Use regular expressions to extract the id, attribute name, and attribute value from the string
+                    match = re.match(r'update\("([^"]*)", "([^"]*)", "([^"]*)"\)', words[1])
+                    if match:
+                        id, attr_name, attr_value = match.groups()
+                        self.do_update(f"{words[0]} {id} {attr_name} {attr_value}")
             else:
                 super().default(line)
         else:
