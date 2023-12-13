@@ -122,27 +122,39 @@ class HBNBCommand(cmd.Cmd):
         if len(args) == 1:
             print("** instance id missing **")
             return
+        instances = storage.all(args[0])
+        key = "{}.{}".format(args[0], args[1])
+        if key not in instances:
+            print("** no instance found **")
+            return
         if len(args) == 2:
             print("** attribute name missing **")
             return
         if len(args) == 3:
             print("** value missing **")
             return
-        instances = storage.all(args[0])
-        key = "{}.{}".format(args[0], args[1])
-        if key not in instances:
-            print("** no instance found **")
-            return
-        attr_name = args[2]
-        attr_value = args[3]
-        if attr_name not in ['id', 'created_at', 'updated_at']:
-            if attr_value.isdigit():
-                attr_value = int(attr_value)
-            elif attr_value.replace('.', '', 1).isdigit():
-                attr_value = float(attr_value)
-            else:
-                attr_value = str(attr_value)  # handle string attribute values
-        setattr(instances[key], attr_name, attr_value)
+        if "{" in args[2]:  # check if the third argument is a dictionary
+            attr_dict = eval(args[2])  # convert the string to a dictionary
+            for attr_name, attr_value in attr_dict.items():
+                if attr_name not in ['id', 'created_at', 'updated_at']:
+                    if isinstance(attr_value, int):
+                        attr_value = int(attr_value)
+                    elif isinstance(attr_value, float):
+                        attr_value = float(attr_value)
+                    else:
+                        attr_value = str(attr_value)  # handle string attribute values
+                    setattr(instances[key], attr_name, attr_value)
+        else:
+            attr_name = args[2]
+            attr_value = args[3]
+            if attr_name not in ['id', 'created_at', 'updated_at']:
+                if attr_value.isdigit():
+                    attr_value = int(attr_value)
+                elif attr_value.replace('.', '', 1).isdigit():
+                    attr_value = float(attr_value)
+                else:
+                    attr_value = str(attr_value)  # handle string attribute values
+                setattr(instances[key], attr_name, attr_value)
         instances[key].save()
         storage.save()
 
