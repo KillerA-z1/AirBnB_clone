@@ -5,43 +5,46 @@
     border: 1px solid #DDDDDD;
     border-radius: 4px;
     display: flex;
+    justify-content: flex-end;
     align-items: center;
 }
 
-.locations, .amenities {
+.filters button {
+    font-size: 18px;
+    background-color: #FF5A5F;
+    color: #FFFFFF;
+    height: 48px;
+    width: 20%;
+    border: none;
+    border-radius: 4px;
+    margin-left: auto;
+    margin-right: 30px;
+}
+
+.filters button:hover {
+    opacity: 0.9;
+}
+
+.filters .locations{
     height: 100%;
     width: 25%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 0 15px;
+    border-right: #DDDDDD solid 1px;
+    margin-left: 30px;
 }
 
-.locations {
-    border-right: 1px solid #DDDDDD;
+.filters .amenities {
+    height: 100%;
+    width: 25%;
+    margin-left: 30px;
 }
 
-h3 {
+.filters .locations h3, .filters .amenities h3 {
     font-weight: 600;
+    margin-bottom: 0px;
 }
 
 h4 {
     font-weight: 400;
     font-size: 14px;
-}
-
-button {
-    background-color: #FF5A5F;
-    color: #FFFFFF;
-    font-size: 18px;
-    height: 48px;
-    width: 20%;
-    border: none;
-    border-radius: 4px;
-    margin-right: 30px;
-    transition: opacity 0.3s ease;
-}
-
-button:hover {
-    opacity: 0.9;
+    margin-top: 0px;
 }
